@@ -32,6 +32,37 @@ print(X_train.shape, X_test.shape)
 
 ''' 코드 작성 바랍니다 '''
 
+from sklearn.tree import DecisionTreeClassifier
+
+param_grid = {
+    "criterion" : ['gini', 'entropy'],
+    "max_depth" : [5 ,10],
+    "min_samples_leaf" : [1, 5, 20]
+}
+
+grid = GridSearchCV(
+    estimator=DecisionTreeClassifier(random_state=42),
+    param_grid=param_grid,
+    cv=5,               
+    scoring='f1'      
+)
+
+grid.fit(X_train, y_train)
+
+print('best_params_ =', grid.best_params_)
+print('best_score_  = %.4f' % grid.best_score_)
+
+model = grid.best_estimator_
+
+imp = pd.Series(model.feature_importances_, index = X_train.columns)
+top10 = imp.sort_values(ascending=False).head(10)
+print(top10)
+
+plt.figure(figsize=(10,6))
+top10.sort_values().plot(kind='barh')
+plt.title('Feature Importance Top10')
+plt.show()
+
 
 ####### B 작업자 작업 수행 #######
 
