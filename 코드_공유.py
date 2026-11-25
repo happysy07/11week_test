@@ -67,3 +67,34 @@ plt.show()
 ####### B 작업자 작업 수행 #######
 
 ''' 코드 작성 바랍니다 '''
+
+from xgboost import XGBClassifier
+
+param_grid_xgb = {
+    "max_depth" : [3, 6, 9],
+    "n_estimators" : [100, 300],
+    "learning_rate" : [0.1, 0.05]
+}
+
+grid_xgb = GridSearchCV(
+    estimator= XGBClassifier(random_state=42),
+    param_grid = param_grid_xgb,
+    cv =5,
+    scoring='f1'
+)
+
+grid_xgb.fit(X_train, y_train)
+
+print('best_params_ =', grid_xgb.best_params_)
+print('best_score_  = %.4f' % grid_xgb.best_score_)
+
+model_xgb = grid_xgb.best_estimator_
+
+imp_xgb = pd.Series(model_xgb.feature_importances_, index = X_train.columns)
+top10_xgb = imp_xgb.sort_values(ascending=False).head(10)
+print(top10_xgb)
+
+plt.figure(figsize=(10,6))
+top10_xgb.sort_values().plot(kind='barh')
+plt.title('XGBoost Feature Importance Top10')
+plt.show()
